@@ -74,16 +74,24 @@ def parseUsers(filename):
 
     return users
 
+# Create a User Item Matrix - m Users, n items = m * n matrix
+def createUserItemMatrix(users, reviews):
+    matrix = []
+    for user in users:
+        return
+
+
+
 
 users = parseUsers('../data/gender_age.json')
-#for key, value in users.items():
-#    print value
-beerData = parseBeerFile('../data/Beeradvocate.txt.gz')
-"""
+for key, value in users.items():
+    print((key, value))
+
+"""beerData = parseBeerFile('../data/Beeradvocate.txt.gz')
+
 count = 0
 for key, value in beerData.items():
     print value
     count +=1
     if count > 30:
-        break
-"""
+        break"""
