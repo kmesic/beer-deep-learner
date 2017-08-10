@@ -9,3 +9,6 @@ cat Beeradvocate.txt.gz.part* > Beeradvocate.txt.gz
 ```
 
 This will create two files that all the data, please process then from these files, Ratebeer.txt.gz and Beeradvocate.txt.gz
+
+##### .gitignore
+It is ignorning all files with the extension .txt.gz
