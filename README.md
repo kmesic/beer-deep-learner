@@ -59,7 +59,7 @@ Based on the item attributes, find other similar items.
 
   Main file will execute everything need to perform the global logic
 
-#### Spacing:
+#### Headers/Spacing:
   Every logical block of code should be separate with a space and a comment explaining the logical block
   ```python
     # Puts item in list only if array is nonempty
@@ -87,4 +87,18 @@ Based on the item attributes, find other similar items.
 
     # Method: newMethod
     # ...
+  ```
+
+  Every file should have a file header
+  ```python
+    # Title: Processor File
+    # Author: Foo Bar
+    # Date: 01/01/1970
+    # Purpose: All classes and methods involved with the processor
+  ```
+
+  Every Class should have a class header
+  ```python
+  # Class: UNIX
+  # Purpose: Handles the UNIX OS  
   ```

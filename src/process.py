@@ -28,7 +28,6 @@ review/text:
 # Class: DataProcesser
 # Purporse: Processes all data and exposes utility methods to perform
 #           operations on the data
-# Arguments: None
 class DataProcesser:
 
     # Method: Constructor
@@ -40,6 +39,9 @@ class DataProcesser:
         self.reviews = []
         self.totalReviews = 0
         self.totalUsers = 0
+        self.totalUserReviewed = 0
+        self.totalBeersReviewed = 0
+        self.totalItems = 0
         self.training = []
         self.testing = []
 
@@ -112,6 +114,8 @@ class DataProcesser:
     def processReviews(self, filename, amount=1000000000000):
         self.reviews = []
         review = {}
+        beers = {}
+        users = {}
         self.totalReviews = 0
 
         # Open the gzip file
@@ -140,6 +144,11 @@ class DataProcesser:
                     # If on field name then new review starting
                     if key[1] == 'name':
                         review = {}
+
+                    # Used to count number of unique beers
+                    elif key[1] == 'beerId':
+                        beers[value] = True
+
                     review[key[1]] = value
 
                 # Otherwise on a review
@@ -150,6 +159,14 @@ class DataProcesser:
                     if key[1] == 'text':
                         self.reviews.append(review)
                         self.totalReviews += 1
+
+                    # Used to count number of unique users
+                    elif key[1] == 'profileName':
+                        users[value] = True
+
+        # Count the total amount of unique beers and users from the reviews
+        self.totalBeersReviewed = len(beers)
+        self.totalUsersReviewed = len(users)
 
 
     # Method: parseUsers
