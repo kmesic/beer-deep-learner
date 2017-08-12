@@ -11,12 +11,11 @@ class Recommender:
     # CLASS VARIABLES of the types of MACHINE LEARNING ALGORITHMS IT CAN PERFORM
     UI_CC = "user-item-collabrative-filtering"
 
-    """TODO: ADD arguments to header"""
     # Method: Constructor
     # Purpose: Creates the Recommeder Machine based on the data and algorithm provided
     # Arguments: trainingData (required)- data to be used for training
     #            testingData (required) - data to be used for testing
-    #
+    #            totalItems (required) - total amount of unique items in the data
     #            alg (optional) - type of machine learning algorithm to use
     def __init__(self, trainingData, testingData, totalItems, alg=None):
         if alg == None:
