@@ -3,11 +3,10 @@
 
 ### Data Files
 
-Beeradvocate contains all reviews for beers by users
-gender_age contains all info about the users that made reviews in Beeradvocate
+Beeradvocate contains all reviews for beers by users.
+gender_age contains all info about the users that made reviews in Beeradvocate.
 
-Beeradvocate.txt.gz has **1586614** total reviews
-gender_age.json has 35610 total users
+Beeradvocate.txt.gz has **1586614** total reviews. gender_age.json has **35610** total users
 
 Because Github has a maximum file size limit, we cannot store the entire file for the data, thus we must split them up.
 After cloning locally, please run these commands to merge them into one:
@@ -62,7 +61,6 @@ Based on the item attributes, find other similar items.
 
 #### Spacing:
   Every logical block of code should be separate with a space and a comment explaining the logical block
-  Ex:
   ```python
     # Puts item in list only if array is nonempty
     if len(l) != 0:
@@ -75,7 +73,6 @@ Based on the item attributes, find other similar items.
   ```
 
   Every method in or outside class should be separate by a two spaces and have a method header
-  Ex:
   ```python
     # Method: printList
     # Purpose: prints all items in list
