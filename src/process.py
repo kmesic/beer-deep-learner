@@ -1,10 +1,28 @@
-# Parser file
+# Title: Data Parser File
 # Author: Kenan Mesic
 # Date: 08/09/17
 
 import gzip
 import re
 import json
+
+"""
+Beer Review Structure in File:
+---Ratings out of 5 in foat---
+beer/name:
+beer/beerId:
+beer/brewerId:
+beer/ABV:
+beer/style:
+review/appearance:
+review/aroma:
+review/palate:
+review/taste:
+review/overall:
+review/time:
+review/profileName:
+review/text:
+"""
 
 # Grab all the beer data and format it into a nice dictionary
 def parseBeerFile(filename):
@@ -16,8 +34,12 @@ def parseBeerFile(filename):
         beers = {}
         beer = {}
         review = {}
+        count = 0
         # Loop through all the lines of the file
         for line in f:
+            if count < 30:
+                print line
+            count += 1
             # Clean the file by striping all tabs and newlines
             line = line.strip()
             line = line.replace("\t", " ")
@@ -73,25 +95,3 @@ def parseUsers(filename):
             users[j['username']] = j
 
     return users
-
-# Create a User Item Matrix - m Users, n items = m * n matrix
-def createUserItemMatrix(users, reviews):
-    matrix = []
-    for user in users:
-        return
-
-
-
-
-users = parseUsers('../data/gender_age.json')
-for key, value in users.items():
-    print((key, value))
-
-"""beerData = parseBeerFile('../data/Beeradvocate.txt.gz')
-
-count = 0
-for key, value in beerData.items():
-    print value
-    count +=1
-    if count > 30:
-        break"""
