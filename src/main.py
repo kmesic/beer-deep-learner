@@ -1,12 +1,12 @@
-from process import parserUsers, parserBeerFile
-"""
-users = parseUsers('../data/gender_age.json')
-for key, value in users.items():
-    print((key, value))
-"""
+from process import Parser
 
-beerData = parseBeerFile('../data/Beeradvocate.txt.gz')
 
+parser = Parser()
+parser.parseBeerFile('../data/Beeradvocate.txt.gz')
+#parser.parseUsers('../data/gender_age.json')
+"""for key, value in parser.users.items():
+    print ((key, value))
+"""
 count = 0
 for key, value in beerData.items():
     print value
