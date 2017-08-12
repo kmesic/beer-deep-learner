@@ -30,20 +30,20 @@ review/text:
 # Arguments: None
 class Parser:
 
-
     # Method: Constructor
     # Purpose: Create the Parser object and initialize storage for data
     # Arguments: None
     def __init__(self):
         self.users = {}
         self.beers = {}
+        self.totalReviews = 0
 
 
     # Method: parseBeerFile
     # Purpose: Grab all the beer data and format it into a nice dictionary
     # Arguments: filename - path to file trying to open
     # Return: None
-    def parseBeerFile(self, filename):
+    def parseBeerFile(self, filename, trainPercent):
         self.beers = {}
 
         # Open the gzip file
@@ -93,6 +93,7 @@ class Parser:
                         if "reviews" not in savedBeer:
                             savedBeer["reviews"] = []
                         savedBeer["reviews"].append(review)
+                        self.totalReviews += 1
 
 
     # Method: parseBeerFile
