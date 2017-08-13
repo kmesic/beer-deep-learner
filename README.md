@@ -48,6 +48,18 @@ Essentially all of CSE 150, where you build a dependency graph of binary nodes. 
 Based on what you like and others who are similar to what you like, then we can recommend
 certain items.
 
+Steps:
+
+1. Build a user to item matrix. This means for every user have a ratings row that has the rating of each item.
+2. Build similarity matrix
+3. Run prediction algorithm
+4. Evaluate it
+
+Links Used:
+https://cambridgespark.com/content/tutorials/implementing-your-own-recommender-systems-in-Python/index.html
+
+http://blog.ethanrosenthal.com/2015/11/02/intro-to-collaborative-filtering/
+
 ###### Content Based Filtering
 Based on the item attributes, find other similar items.
 
