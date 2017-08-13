@@ -5,6 +5,7 @@
 
 import numpy as np
 from sklearn import metrics
+from math import sqrt
 
 
 # Class: DataProcesser
@@ -83,6 +84,63 @@ class Recommender:
 
         return matrix
 
+
+    # Method: predict
+    # Purpose: Create a prediction matrix by performing the formulas described
+    #          in the README
+    # Arguments: alg (optional) - algorithm to use (user-item or item-item),
+    #                             defaults to user-item
+    # Return: None
+    def predict(self, alg="user"):
+        self.prediction = []
+        if alg == "user":
+            # Get the average rating for each user
+            mean_users = self.trainingMatrix.mean(axis=1)
+
+            # Convert the mean into multiple rows of one column instead of one
+            # row to be able to subtract each mean of the row by each element in
+            # row of the user
+            mean_users = mean_users[:, np.newaxis]
+            data_diff_mean = self.trainingMatrix - mean_users
+
+            # Calculate the prediction matrix based on the formula in README
+            denominator = np.abs(self.simMatrix).sum(axis=1)[:, np.newaxis]
+            numerator = self.simMatrix.dot(data_diff_mean)
+            self.prediction = mean_users + (numerator/denominator)
+
+        # Similiar formula to user-item expect no need to account for user bias
+        # so no need to subtract by mean on each row and then add it back at
+        # the end.
+        elif alg == "item":
+            numerator = self.trainingMatrix.dot(self.simMatrix)
+
+            # Same as user-item because similarity matrix is diagonal
+            # expect keep summation as one long list that will be divided by
+            # each row
+            denominator = np.array([np.abs(self.simMatrix).sum(axis=1)])
+            self.prediction = numerator/denominator
+
+
+    # Method: evaluate
+    # Purpose: Perform Root Mean Square Error on the prediction and test data
+    # Arguments: None
+    # Return: Root Mean Square Error from recommender and test data
+    def evaluate(self, kind="rmse"):
+        # Only what to compare what is in the test data
+        test_data_nonzero_idxs = self.testingMatrix.nonzero()
+
+        # Get all nonzero ratings from test data and its corresponding predictions
+        # then run RMSE on it
+        test_ratings = self.testingMatrix[test_data_nonzero_idxs].flatten()
+        predict_ratings = self.prediction[test_data_nonzero_idxs].flatten()
+        mse = metrics.mean_squared_error(predict_ratings, test_ratings)
+        if kind == "rmse":
+            return sqrt(mse)
+        elif kind == "mse":
+            return mse
+        else:
+            return 0
+
     # Method: createSimMatrix
     # Purpose: Create a Similarity Matrix from the training data and use cosine
     #          similarity as a way to find similarity between two users or items
@@ -93,9 +151,9 @@ class Recommender:
     # Return: None
     def createSimMatrix(self, alg="user", sim="cosine"):
         if alg == "user":
-            self.simMatrix = metrics.pairwise.pairwise_distances(self.trainingData,metric='cosine')
+            self.simMatrix = metrics.pairwise.pairwise_distances(self.trainingMatrix,metric='cosine')
         elif alg == "item":
-            self.simMatrix = metrics.pairwise.pairwise_distances(self.trainingData.T,metric='cosine')
+            self.simMatrix = metrics.pairwise.pairwise_distances(self.trainingMatrix.T,metric='cosine')
 
 
     """ THIS METHOD IS FOR LEARNING PURPOSES NOT PRODUCTION"""
@@ -115,11 +173,8 @@ class Recommender:
             # Perform cosine similarity dependent on algorithm
             if alg == self.UI_CC:
                 simMatrix = self.trainingMatrix.dot(self.trainingMatrix.T) + errorDecimal
-            elif alg == self.II_CC;
+            elif alg == self.II_CC:
                 simMatrix = self.trainingMatrix.T.dot(self.trainingMatrix) + errorDecimal
             normalization = np.array([np.sqrt(np.diagonal(simMatrix))])
 
             self.similarityMatrix = simMatrix/(normalization * normalization.T)
-
-        elif speed == "slow":
-            # Slow algorithm
