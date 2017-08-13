@@ -44,6 +44,17 @@ A model in machine learning is just a way to organize the data and perform an al
 Essentially all of CSE 150, where you build a dependency graph of binary nodes. Then calculate the probabilities of certain nodes occurring from the graph.
 
 #### Recommenders:
+
+Evaluating your recommender:
+1. Offline Ways:
+  1.  Root Mean Squared Error (RMSE) - You take only a subset of these ratings, say 80% (called the train set), build the RS on them, and then ask the RS to predict the ratings on the 20% you’ve hidden (the test set). And so it may happen that a test user rated some item with 4 stars, but your model predicts 3.5, hence it has an error of 0.5 on that rating, and that’s exactly where RMSE comes from. Then you just compute the average of the errors from the whole test set using a formula and get a final result of 0.71623
+  2. Recall - You may have hidden 4 purchased items and ask the RS for 10 items. You may get 0%, 25%, 50%, 75%, or 100% accuracy for that user, depending on how many of the hidden 4 appeared in the recommended 10. Take the average over the entire test set.
+  3. Mean Absolute Error (MAE)- Same as RMSE, just does not penalize on large errors
+
+2. Online Ways:
+  1. Click-Through Rate (CTR) - number of times the user clicked on a recommendation
+  2. Conversion Rate (CR) - number of times the user went ahead and bought the recommendation
+
 ###### Collaborative Filtering
 Based on what you like and others who are similar to what you like, then we can recommend
 certain items.
@@ -55,13 +66,15 @@ Steps:
 3. Run prediction algorithm
 4. Evaluate it
 
+###### Content Based Filtering
+Based on the item attributes, find other similar items.
+
 Links Used:
 https://cambridgespark.com/content/tutorials/implementing-your-own-recommender-systems-in-Python/index.html
 
 http://blog.ethanrosenthal.com/2015/11/02/intro-to-collaborative-filtering/
 
-###### Content Based Filtering
-Based on the item attributes, find other similar items.
+https://medium.com/recombee-blog/evaluating-recommender-systems-choosing-the-best-one-for-your-business-c688ab781a35
 
 ## Style Guide
 
