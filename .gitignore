@@ -1,2 +1,4 @@
 *.gz
 *.pyc
+test_mat.txt
+train_mat.txt

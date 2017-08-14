@@ -6,6 +6,7 @@
 import numpy as np
 from sklearn import metrics
 from math import sqrt
+import os.path
 
 
 # Class: DataProcesser
@@ -17,6 +18,9 @@ class Recommender:
     CC = "Collaborative Filtering"
     UI_CC = "user-item-collabrative-filtering"
     II_CC = "item-item-collabrative-filtering"
+    FILE_TRAIN_MAT = "../data/train_mat.txt"
+    FILE_TEST_MAT = "../data/test_mat.txt"
+
 
     # Method: Constructor
     # Purpose: Creates the Recommeder Machine based on the data and algorithm provided
@@ -24,63 +28,55 @@ class Recommender:
     #            testingData (required) - data to be used for testing
     #            totalItems (required) - total amount of unique items in the data
     #            alg (optional) - type of machine learning algorithm to use
-    def __init__(self, trainingData, testingData, totalItems, alg=None):
+    #            readFromFiles (optional) - read the training matrix and testing matrix
+    #                                       from files
+    def __init__(self, trainingData=None, testingData=None, totalUsers=None, totalItems=None, alg=None, readFromFiles=True):
         if alg == None:
             alg = self.CC
 
         # Perform User-Item Collaborative Filtering
         if alg == self.CC:
-            self.trainingMatrix = self.createUserItemMatrix(trainingData, totalItems)
-            self.testingMatrix = self.createUserItemMatrix(testingData, totalItems)
 
-            # Convert these to numpy arrays for faster calculations
-            self.trainingMatrix = np.array(self.trainingMatrix)
-            self.testingMatrix = np.array(self.testingMatrix)
+            # Load training matrix if already saved
+            if readFromFiles and os.path.isfile(self.FILE_TRAIN_MAT):
+                self.trainingMatrix = np.loadtxt(self.FILE_TRAIN_MAT)
+            else:
+                # Create training matrix and convert these to numpy arrays for faster calculations
+                self.trainingMatrix = self.createUserItemMatrix(trainingData, totalUsers, totalItems)
+
+                # Save for future use
+                np.savetxt(self.FILE_TRAIN_MAT, self.trainingMatrix, fmt='%1.1f')
+
+            # Load testing matrix if already saved
+            if readFromFiles and os.path.isfile(self.FILE_TEST_MAT):
+                self.testingMatrix = np.loadtxt(self.FILE_TEST_MAT)
+            else:
+                # Create testing matrix and convert these to numpy arrays for faster calculations
+                self.testingMatrix = self.createUserItemMatrix(testingData, totalUsers, totalItems)
+
+                # Save for future use
+                np.savetxt(self.FILE_TEST_MAT, self.testingMatrix, fmt='%1.1f')
 
 
     # Method: createUserItemMatrix
     # Purpose: Create a User Item Matrix - m Users, n items = m * n matrix
     # Arguments: data (required) - data to be used to build the matrix
     # Return: the matrix created
-    def createUserItemMatrix(self, data, totalItems):
-        # Mapping of users and items to the row and column in the matrix
-        users = {}
-        items = {}
-        userCounter = 0
-        itemCounter = 0
+    def createUserItemMatrix(self, data, totalUsers, totalItems):
 
         # Initialize the matrix
-        matrix = []
+        matrix = np.zeros((totalUsers, totalItems))
 
         # Go through each review in the data and add the data of the review to the matrix
         for review in data:
             # Get the idx of the user in the matrix
-            userIdx = -1
-            user = review["profileName"]
-            if user in users:
-                userIdx = users[user]
-
-            # If does not exist create a new row for the user
-            else:
-                matrix.append([0.0 for i in range(0, totalItems)])
-                userIdx = userCounter
-                users[user] = userIdx
-                userCounter += 1
+            userIdx = review["userIdx"]
 
             # Get the idx of the item in the matrix
-            item = review["beerId"]
-            itemIdx = -1
-            if item in items:
-                itemIdx = items[item]
-
-            # If does not exist use a unused idx from the row
-            else:
-                itemIdx = itemCounter
-                items[item] = itemIdx
-                itemCounter += 1
+            itemIdx = review["itemIdx"]
 
             # Convert the overall rating to float and save to the matrix
-            matrix[userIdx][itemIdx] = float(review["overall"])
+            matrix[userIdx, itemIdx] = float(review["overall"])
 
         return matrix
 
@@ -140,6 +136,7 @@ class Recommender:
             return mse
         else:
             return 0
+
 
     # Method: createSimMatrix
     # Purpose: Create a Similarity Matrix from the training data and use cosine

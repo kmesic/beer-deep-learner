@@ -1,24 +1,45 @@
+import sys
 from process import DataProcesser
 from recommender import Recommender
 
+class Main:
 
-dataProcessor = DataProcesser()
-#parser.parseBeerFile('../data/Beeradvocate.txt.gz', 100)
-dataProcessor.processReviews('../data/Beeradvocate.txt.gz')
-dataProcessor.parseUsers('../data/gender_age.json')
-dataProcessor.createTrainingTestingData(75)
-print(len(dataProcessor.training))
-print(len(dataProcessor.testing))
-recommendMachine = Recommender(dataProcessor.training, dataProcessor.testing,
-                               dataProcessor.totalBeersReviewed)
+    def __init__(self, args):
+        self.args = args
 
-print "Creating Similiarity Matrix"
-recommendMachine.createSimMatrix()
+    def run(self):
+        recommendMachine = None
+        if (len(self.args) > 1 and self.args[1] == "-sp"):
+            print "Building Recommender Machine"
+            recommendMachine = Recommender(readFromFiles=True)
 
-print "Creating Predictions"
-recommendMachine.predict()
+        else:
+            dataProcessor = DataProcesser()
+            dataProcessor.processReviews('../data/Beeradvocate.txt.gz', 100000)
+            dataProcessor.parseUsers('../data/gender_age.json')
+            dataProcessor.createTrainingTestingData(75)
+            print(len(dataProcessor.training))
+            print(len(dataProcessor.testing))
 
-print "Calulating Testing Error"
-error = recommendMachine.evaluate()
+            print "Building Recommender Machine"
+            recommendMachine = Recommender(dataProcessor.training,
+                                           dataProcessor.testing,
+                                           dataProcessor.totalUsersReviewed,
+                                           dataProcessor.totalBeersReviewed,
+                                           readFromFiles=False)
 
-print ("RMSE for User-Item: %f", error)
+        print "Creating Similiarity Matrix"
+        recommendMachine.createSimMatrix()
+
+        print "Creating Predictions"
+        recommendMachine.predict()
+
+        print "Calulating Testing Error"
+        error = recommendMachine.evaluate()
+
+        print ("RMSE for User-Item: %f", error)
+
+
+# Run the main
+main = Main(sys.argv)
+main.run()

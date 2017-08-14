@@ -25,10 +25,12 @@ review/profileName:
 review/text:
 """
 
+
 # Class: DataProcesser
 # Purporse: Processes all data and exposes utility methods to perform
 #           operations on the data
 class DataProcesser:
+
 
     # Method: Constructor
     # Purpose: Create the Parser object and initialize storage for data
@@ -116,6 +118,8 @@ class DataProcesser:
         review = {}
         beers = {}
         users = {}
+        uniqueIdxUser = 0
+        uniqueIdxItem = 0
         self.totalReviews = 0
 
         # Open the gzip file
@@ -147,7 +151,12 @@ class DataProcesser:
 
                     # Used to count number of unique beers
                     elif key[1] == 'beerId':
-                        beers[value] = True
+                        if value in beers:
+                            review["itemIdx"] = beers[value]
+                        else:
+                            beers[value] = uniqueIdxItem
+                            review["itemIdx"] = uniqueIdxItem
+                            uniqueIdxItem += 1
 
                     review[key[1]] = value
 
@@ -162,7 +171,13 @@ class DataProcesser:
 
                     # Used to count number of unique users
                     elif key[1] == 'profileName':
-                        users[value] = True
+                        if value in users:
+                            review["userIdx"] = users[value]
+                        else:
+                            users[value] = uniqueIdxUser
+                            review["userIdx"] = uniqueIdxUser
+                            uniqueIdxUser += 1
+
 
         # Count the total amount of unique beers and users from the reviews
         self.totalBeersReviewed = len(beers)
