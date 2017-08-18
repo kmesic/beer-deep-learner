@@ -21,6 +21,12 @@ class Main:
             print(len(dataProcessor.training))
             print(len(dataProcessor.testing))
 
+            numerator = float(len(dataProcessor.training))
+            denominator = float(dataProcessor.totalUsersReviewed * dataProcessor.totalBeersReviewed)
+            sparsity = numerator/denominator
+            sparsity *= 100
+            print("Sparsity Percentage: " + str(sparsity))
+
             print "Building Recommender Machine"
             recommendMachine = Recommender(dataProcessor.training,
                                            dataProcessor.testing,
@@ -28,16 +34,20 @@ class Main:
                                            dataProcessor.totalBeersReviewed,
                                            readFromFiles=False)
 
-        print "Creating Similiarity Matrix"
-        recommendMachine.createSimMatrix()
+        # Model based filtering
+        if ("-mf" in self.args):
+            return
+        else:
+            print "Creating Similiarity Matrix"
+            recommendMachine.createSimMatrix()
 
-        print "Creating Predictions"
-        recommendMachine.predict()
+            print "Creating Predictions"
+            recommendMachine.predict()
 
-        print "Calulating Testing Error"
-        error = recommendMachine.evaluate()
+            print "Calulating Testing Error"
+            error = recommendMachine.evaluate()
 
-        print ("RMSE for User-Item: %f", error)
+            print ("RMSE for User-Item: %f", error)
 
 
 # Run the main
