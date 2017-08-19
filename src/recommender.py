@@ -148,9 +148,9 @@ class Recommender:
     # Return: None
     def createSimMatrix(self, alg="user", sim="cosine"):
         if alg == "user":
-            self.simMatrix = metrics.pairwise.pairwise_distances(self.trainingMatrix,metric='cosine')
+            self.simMatrix = metrics.pairwise.pairwise_distances(self.trainingMatrix,metric=sim)
         elif alg == "item":
-            self.simMatrix = metrics.pairwise.pairwise_distances(self.trainingMatrix.T,metric='cosine')
+            self.simMatrix = metrics.pairwise.pairwise_distances(self.trainingMatrix.T,metric=sim)
 
 
     """ THIS METHOD IS FOR LEARNING PURPOSES NOT PRODUCTION"""

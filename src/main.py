@@ -29,7 +29,7 @@ class Main:
                                            readFromFiles=False)
 
         print "Creating Similiarity Matrix"
-        recommendMachine.createSimMatrix()
+        recommendMachine.createSimMatrix(sim="cosine")
 
         print "Creating Predictions"
         recommendMachine.predict()
