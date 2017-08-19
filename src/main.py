@@ -9,13 +9,23 @@ class Main:
 
     def run(self):
         recommendMachine = None
-        if (len(self.args) > 1 and self.args[1] == "-sp"):
+        saveToFile = False
+        normalizeDataBefore = False
+        if ("-sf" in self.args):
+            saveToFile = True
+
+        if ("-ndb" in self.args):
+            normalizeDataBefore = True
+
+        if ("-sp" in self.args):
             print "Building Recommender Machine"
-            recommendMachine = Recommender(readFromFiles=True)
+            recommendMachine = Recommender(saveToFile=saveToFile,
+                                           normalizeDataBefore=normalizeDataBefore,
+                                           readFromFiles=True)
 
         else:
             dataProcessor = DataProcesser()
-            dataProcessor.processReviews('../data/Beeradvocate.txt.gz', 100000)
+            dataProcessor.processReviews('../data/Beeradvocate.txt.gz', 1000000)
             dataProcessor.parseUsers('../data/gender_age.json')
             dataProcessor.createTrainingTestingData(75)
             print(len(dataProcessor.training))
@@ -32,11 +42,20 @@ class Main:
                                            dataProcessor.testing,
                                            dataProcessor.totalUsersReviewed,
                                            dataProcessor.totalBeersReviewed,
+                                           saveToFile=saveToFile,
+                                           normalizeDataBefore=normalizeDataBefore,
                                            readFromFiles=False)
 
+        alg = "User Item Collaborative Filtering"
         # Model based filtering
         if ("-mf" in self.args):
-            return
+            alg = "Matrix Factorization"
+
+            print "Decomposing training matrix into smaller matrices"
+            recommendMachine.matrix_factorization()
+
+            print "Creating Predictions"
+            recommendMachine.predict(alg=recommendMachine.MF)
         else:
             print "Creating Similiarity Matrix"
             recommendMachine.createSimMatrix(sim="cosine")
@@ -44,10 +63,11 @@ class Main:
             print "Creating Predictions"
             recommendMachine.predict()
 
-            print "Calulating Testing Error"
-            error = recommendMachine.evaluate()
+        print "Calulating Testing Error"
+        error = recommendMachine.evaluate()
 
-            print ("RMSE for User-Item: %f", error)
+
+        print ("RMSE for " + alg + " : " + str(error))
 
 
 # Run the main

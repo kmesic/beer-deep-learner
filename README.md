@@ -56,6 +56,18 @@ Evaluating your recommender:
   * Conversion Rate (CR) - number of times the user went ahead and bought the recommendation
 
 ###### Collaborative Filtering
+
+Normalization of data:
+
+If we normalize ratings, by subtracting from each rating the average rating
+of that user, we turn low ratings into negative numbers and high ratings into
+positive numbers. If we then take the cosine distance, we find that users with
+opposite views of the movies they viewed in common will have vectors in almost
+opposite directions, and can be considered as far apart as possible. However,
+users with similar opinions about the movies rated in common will have a
+relatively small angle between them
+
+
 Based on what you like and others who are similar to what you like, then we can recommend
 certain items.
 

@@ -8,9 +8,42 @@ Collaborative Filtering (User-Item):
 100,000 reviews:
   - Training (75,000 reviews), Testing (25,000 reviews)
   ** Sparsity: 0.16% **
-  ** RMSE: 3.7464120978268975**
+  ** RMSE: 3.7464120978268975 **
+
+  - Same set, normalized data before similarity matrix:
+  ** Sparsity: 0.16% **
+  ** RMSE: 3.746683753105479 **
 
 Collaborative Filtering (Item-item):
 
 
 Model-based Filtering:
+
+  Matrix Factorization, k=50:
+    - Training(75,000 reviews), Testing (25,000 reviews), normalize before
+      k=50:
+      ** Sparsity: 0.16% **
+      ** RMSE: 3.73767047937 **
+
+      k=20:
+      ** Sparsity: 0.16% **
+      ** RMSE: 3.57921349199 **
+
+      k=10:
+      ** Sparsity: 0.16% **
+      ** RMSE: 3.4966034184 **
+
+
+
+    - Training(750,000 reviews), Testing (250,000 reviews), normalize before
+      k=50:
+      ** Sparsity: 0.07% **
+      ** RMSE: 3.32562613912 **
+
+      k=20:
+      ** Sparsity: 0.07% **
+      ** RMSE: 3.28444670516 **
+
+      k=10:
+      ** Sparsity: 0.07% **
+      ** RMSE: 3.31044416035 **

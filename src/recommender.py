@@ -5,6 +5,7 @@
 
 import numpy as np
 from sklearn import metrics
+from scipy.sparse.linalg import svds
 from math import sqrt
 import os.path
 
@@ -18,6 +19,7 @@ class Recommender:
     CC = "Collaborative Filtering"
     UI_CC = "user-item-collabrative-filtering"
     II_CC = "item-item-collabrative-filtering"
+    MF = "matrix_factorization"
     FILE_TRAIN_MAT = "../data/train_mat.txt"
     FILE_TEST_MAT = "../data/test_mat.txt"
 
@@ -30,7 +32,14 @@ class Recommender:
     #            alg (optional) - type of machine learning algorithm to use
     #            readFromFiles (optional) - read the training matrix and testing matrix
     #                                       from files
-    def __init__(self, trainingData=None, testingData=None, totalUsers=None, totalItems=None, alg=None, readFromFiles=True):
+    def __init__(self, trainingData=None,
+                       testingData=None,
+                       totalUsers=None,
+                       totalItems=None,
+                       alg=None,
+                       saveToFile=False,
+                       readFromFiles=True,
+                       normalizeDataBefore=False):
         if alg == None:
             alg = self.CC
 
@@ -44,8 +53,22 @@ class Recommender:
                 # Create training matrix and convert these to numpy arrays for faster calculations
                 self.trainingMatrix = self.createUserItemMatrix(trainingData, totalUsers, totalItems)
 
-                # Save for future use
-                np.savetxt(self.FILE_TRAIN_MAT, self.trainingMatrix, fmt='%1.1f')
+                self.normalizeDataBefore = normalizeDataBefore
+
+                # Average of each row
+                mean_users_ratings = self.trainingMatrix.mean(axis=1)
+
+                # Convert the mean into multiple rows of one column instead of one
+                # row to be able to subtract each mean of the row by each element in
+                # row of the user
+                self.mean_users_ratings = mean_users_ratings.reshape(-1, 1)
+
+                if normalizeDataBefore == True:
+                    self.trainingMatrix = self.trainingMatrix - self.mean_users_ratings
+
+                if saveToFile == True:
+                    # Save for future use
+                    np.savetxt(self.FILE_TRAIN_MAT, self.trainingMatrix, fmt='%1.1f')
 
             # Load testing matrix if already saved
             if readFromFiles and os.path.isfile(self.FILE_TEST_MAT):
@@ -54,8 +77,9 @@ class Recommender:
                 # Create testing matrix and convert these to numpy arrays for faster calculations
                 self.testingMatrix = self.createUserItemMatrix(testingData, totalUsers, totalItems)
 
-                # Save for future use
-                np.savetxt(self.FILE_TEST_MAT, self.testingMatrix, fmt='%1.1f')
+                if saveToFile == True:
+                    # Save for future use
+                    np.savetxt(self.FILE_TEST_MAT, self.testingMatrix, fmt='%1.1f')
 
 
     # Method: createUserItemMatrix
@@ -83,6 +107,17 @@ class Recommender:
         return matrix
 
 
+    # Method: matrix_factorization
+    # Purpose: Apply SVD, singular-value decomposition, to decompose the matrix
+    #          into three matrixes that are can be multiplied together to produce
+    #          a similiar training matrix...more info in README
+    # Arguments: None
+    # Return: None
+    def matrix_factorization(self):
+        self.U, sigma, self.Vt = svds(self.trainingMatrix, k=20)
+        self.sigma = np.diag(sigma)
+
+
     # Method: predict
     # Purpose: Create a prediction matrix by performing the formulas described
     #          in the README
@@ -91,20 +126,21 @@ class Recommender:
     # Return: None
     def predict(self, alg="user"):
         self.prediction = []
-        if alg == "user":
-            # Get the average rating for each user
-            mean_users = self.trainingMatrix.mean(axis=1)
 
-            # Convert the mean into multiple rows of one column instead of one
-            # row to be able to subtract each mean of the row by each element in
-            # row of the user
-            mean_users = mean_users[:, np.newaxis]
-            data_diff_mean = self.trainingMatrix - mean_users
+        # User-item algorithm using the similarity matrix
+        if alg == "user":
+
+            if self.normalizeDataBefore == False:
+                trainingMatrix_adjusted = self.trainingMatrix - self.mean_users_ratings
+
+            elif self.normalizeDataBefore == True:
+                trainingMatrix_adjusted = self.trainingMatrix
 
             # Calculate the prediction matrix based on the formula in README
             denominator = np.abs(self.simMatrix).sum(axis=1)[:, np.newaxis]
-            numerator = self.simMatrix.dot(data_diff_mean)
-            self.prediction = mean_users + (numerator/denominator)
+            numerator = self.simMatrix.dot(trainingMatrix_adjusted)
+            self.prediction = self.mean_users_ratings + (numerator/denominator)
+
 
         # Similiar formula to user-item expect no need to account for user bias
         # so no need to subtract by mean on each row and then add it back at
@@ -117,6 +153,16 @@ class Recommender:
             # each row
             denominator = np.array([np.abs(self.simMatrix).sum(axis=1)])
             self.prediction = numerator/denominator
+
+        # From matrix_factorization, we can take the decomposed matrix and apply
+        # dot product to get the predictions...more on README
+        elif alg == "matrix_factorization":
+
+            # Perform U * sigma * Vt, Add the mean_users_ratings back to get
+            # predictions in between 1 and 5
+            U_dot_sigma = np.dot(self.U, self.sigma)
+            self.prediction = np.dot(U_dot_sigma, self.Vt) + self.mean_users_ratings
+
 
 
     # Method: evaluate
@@ -153,13 +199,6 @@ class Recommender:
             self.simMatrix = metrics.pairwise.pairwise_distances(self.trainingMatrix,metric=sim)
         elif alg == "item":
             self.simMatrix = metrics.pairwise.pairwise_distances(self.trainingMatrix.T,metric=sim)
-
-
-    def calculateSparsity(self):
-        totalNonzeroValues = float(len(self.trainingMatrix.nonzero()[0]))
-        sparsity = totalNozeroValues/(self.trainingMatrix.shape[0]*self.trainingMatrix.shape[1])
-        sparsity *= 100
-        return sparsity
 
 
     """ THIS METHOD IS FOR LEARNING PURPOSES NOT PRODUCTION"""
