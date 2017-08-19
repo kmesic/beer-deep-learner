@@ -61,6 +61,8 @@ class Recommender:
     # Method: createUserItemMatrix
     # Purpose: Create a User Item Matrix - m Users, n items = m * n matrix
     # Arguments: data (required) - data to be used to build the matrix
+    #            totalUsers (required) - total amount of users
+    #            totalItems (required) - total amount of items
     # Return: the matrix created
     def createUserItemMatrix(self, data, totalUsers, totalItems):
 
@@ -151,6 +153,13 @@ class Recommender:
             self.simMatrix = metrics.pairwise.pairwise_distances(self.trainingMatrix,metric=sim)
         elif alg == "item":
             self.simMatrix = metrics.pairwise.pairwise_distances(self.trainingMatrix.T,metric=sim)
+
+
+    def calculateSparsity(self):
+        totalNonzeroValues = float(len(self.trainingMatrix.nonzero()[0]))
+        sparsity = totalNozeroValues/(self.trainingMatrix.shape[0]*self.trainingMatrix.shape[1])
+        sparsity *= 100
+        return sparsity
 
 
     """ THIS METHOD IS FOR LEARNING PURPOSES NOT PRODUCTION"""

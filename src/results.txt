@@ -1,0 +1,16 @@
+Collaborative Filtering (User-Item):
+
+1,000,000 reviews:
+  - Training (750,000 reviews), Testing (250,000 reviews)
+  ** Sparsity: 0.07% **
+  ** RMSE: 3.814000651410227 **
+
+100,000 reviews:
+  - Training (75,000 reviews), Testing (25,000 reviews)
+  ** Sparsity: 0.16% **
+  ** RMSE: 3.7464120978268975**
+
+Collaborative Filtering (Item-item):
+
+
+Model-based Filtering:
