@@ -111,10 +111,13 @@ class Recommender:
     # Purpose: Apply SVD, singular-value decomposition, to decompose the matrix
     #          into three matrixes that are can be multiplied together to produce
     #          a similiar training matrix...more info in README
-    # Arguments: None
+    # Arguments: k (optional) - specify how many hidden features to find,
+    #                           default to 10
     # Return: None
-    def matrix_factorization(self):
-        self.U, sigma, self.Vt = svds(self.trainingMatrix, k=20)
+    def matrix_factorization(self, k=10):
+
+        # Perform singular-value decomposition and convert sigma into diagonal matrix
+        self.U, sigma, self.Vt = svds(self.trainingMatrix, k=k)
         self.sigma = np.diag(sigma)
 
 

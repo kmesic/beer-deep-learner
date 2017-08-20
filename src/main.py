@@ -11,6 +11,16 @@ class Main:
         recommendMachine = None
         saveToFile = False
         normalizeDataBefore = False
+        totalRatings = 100000
+
+        if ("-tr" in self.args):
+            try:
+                idxTr = self.args.index("-tr")
+                totalRatings = int(self.args[idxTr + 1])
+            except (ValueError, IndexError) as e:
+                print "Invalid Usage of arguments in program for -tr"
+                return
+
         if ("-sf" in self.args):
             saveToFile = True
 
@@ -24,8 +34,9 @@ class Main:
                                            readFromFiles=True)
 
         else:
+            print("Processing " + str(totalRatings) + " ratings")
             dataProcessor = DataProcesser()
-            dataProcessor.processReviews('../data/Beeradvocate.txt.gz', 1000000)
+            dataProcessor.processReviews('../data/Beeradvocate.txt.gz', totalRatings)
             dataProcessor.parseUsers('../data/gender_age.json')
             dataProcessor.createTrainingTestingData(75)
             print(len(dataProcessor.training))
@@ -49,10 +60,16 @@ class Main:
         alg = "User Item Collaborative Filtering"
         # Model based filtering
         if ("-mf" in self.args):
-            alg = "Matrix Factorization"
+            idxMf = self.args.index("-mf")
+            kValue = 10
+            try:
+                kValue = int(self.args[idxMf + 1])
+            except (ValueError, IndexError) as e:
+                print "Invalid Usage of arguments in program for -mf"
+                return
 
-            print "Decomposing training matrix into smaller matrices"
-            recommendMachine.matrix_factorization()
+            print("Decomposing training matrix into smaller matrices with hidden features of " + str(kValue))
+            recommendMachine.matrix_factorization(k=kValue)
 
             print "Creating Predictions"
             recommendMachine.predict(alg=recommendMachine.MF)

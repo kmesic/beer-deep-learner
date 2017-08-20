@@ -47,3 +47,7 @@ Model-based Filtering:
       k=10:
       ** Sparsity: 0.07% **
       ** RMSE: 3.31044416035 **
+
+      k=6:
+      ** Sparsity: 0.07% **
+      ** RMSE: 3.3524632353 **
