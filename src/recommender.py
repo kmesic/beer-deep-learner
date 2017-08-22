@@ -114,11 +114,20 @@ class Recommender:
     # Arguments: k (optional) - specify how many hidden features to find,
     #                           default to 10
     # Return: None
-    def matrix_factorization(self, k=10):
+    def matrix_factorization(self, k=10, alg="svd"):
 
         # Perform singular-value decomposition and convert sigma into diagonal matrix
-        self.U, sigma, self.Vt = svds(self.trainingMatrix, k=k)
-        self.sigma = np.diag(sigma)
+        if alg == "svd":
+            self.U, sigma, self.Vt = svds(self.trainingMatrix, k=k)
+            self.sigma = np.diag(sigma)
+
+        # Perform stochastic gradient descent
+        elif alg == "sgd":
+            return
+
+        # Perform Alternating Least Squares
+        elif alg == "als":
+            return
 
 
     # Method: predict
