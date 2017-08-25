@@ -130,6 +130,17 @@ class Recommender:
             return
 
 
+    # Method: stochastic_gradient_descent
+    # Purpose: TODO
+    # Arguments: TODO
+    # Return: TODO
+    def stochastic_gradient_descent(self,
+                                    k=10,
+                                    item_regularization=0,
+                                    user_regularization=0):
+        return
+
+
     # Method: predict
     # Purpose: Create a prediction matrix by performing the formulas described
     #          in the README
