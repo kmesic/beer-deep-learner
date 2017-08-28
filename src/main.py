@@ -74,8 +74,10 @@ class Main:
                 print "Creating Predictions"
                 recommendMachine.predict(alg=recommendMachine.MF_SVD)
             elif ("sgd" in self.args):
+                iterations = [1, 2, 5, 10, 25, 50, 100, 200]
+
                 print("Decomposing training matrix into smaller matrices with hidden features of " + str(kValue))
-                recommendMachine.stochastic_gradient_descent(k=kValue)
+                recommendMachine.stochastic_gradient_descent(k=kValue, iterations=1)
 
                 print "Creating Predictions"
                 recommendMachine.predict(alg=recommendMachine.MF_SGD)

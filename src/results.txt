@@ -19,35 +19,44 @@ Collaborative Filtering (Item-item):
 
 Model-based Filtering:
 
-  Matrix Factorization, k=50:
+  Matrix Factorization (SVDs):
     - Training(75,000 reviews), Testing (25,000 reviews), normalize before
+    ** Sparsity: 0.16% **
+
       k=50:
-      ** Sparsity: 0.16% **
       ** RMSE: 3.73767047937 **
 
       k=20:
-      ** Sparsity: 0.16% **
       ** RMSE: 3.57921349199 **
 
       k=10:
-      ** Sparsity: 0.16% **
       ** RMSE: 3.4966034184 **
 
 
 
     - Training(750,000 reviews), Testing (250,000 reviews), normalize before
+    ** Sparsity: 0.07% **
+
       k=50:
-      ** Sparsity: 0.07% **
       ** RMSE: 3.32562613912 **
 
       k=20:
-      ** Sparsity: 0.07% **
       ** RMSE: 3.28444670516 **
 
       k=10:
-      ** Sparsity: 0.07% **
       ** RMSE: 3.31044416035 **
 
       k=6:
-      ** Sparsity: 0.07% **
       ** RMSE: 3.3524632353 **
+
+
+  Matrix Factorization (stochastic gradient descent):
+    - Training(75,000 reviews), Testing (25,000 reviews)
+    ** Sparsity: 0.16% **
+
+      k=10:
+        iterations 1:
+
+        iterations 10:
+
+    - Training(750,000 reviews), Testing (250,000 reviews)
