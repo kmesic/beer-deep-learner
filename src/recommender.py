@@ -19,7 +19,8 @@ class Recommender:
     CC = "Collaborative Filtering"
     UI_CC = "user-item-collabrative-filtering"
     II_CC = "item-item-collabrative-filtering"
-    MF = "matrix_factorization"
+    MF_SVD = "matrix_factorization_svd"
+    MF_SGD = "matrix_factorization_sgd"
     FILE_TRAIN_MAT = "../data/train_mat.txt"
     FILE_TEST_MAT = "../data/test_mat.txt"
 
@@ -107,14 +108,14 @@ class Recommender:
         return matrix
 
 
-    # Method: matrix_factorization
+    # Method: matrix_factorization_svd
     # Purpose: Apply SVD, singular-value decomposition, to decompose the matrix
     #          into three matrixes that are can be multiplied together to produce
     #          a similiar training matrix...more info in README
     # Arguments: k (optional) - specify how many hidden features to find,
     #                           default to 10
     # Return: None
-    def matrix_factorization(self, k=10, alg="svd"):
+    def matrix_factorization_svd(self, k=10, alg="svd"):
 
         # Perform singular-value decomposition and convert sigma into diagonal matrix
         if alg == "svd":
@@ -136,9 +137,51 @@ class Recommender:
     # Return: TODO
     def stochastic_gradient_descent(self,
                                     k=10,
-                                    item_regularization=0,
-                                    user_regularization=0):
-        return
+                                    learning_rate=0.0002,
+                                    regularization=0.02,
+                                    iterations=1):
+        # Create two matrices to be used for spliting the training matrix
+        totalUsers = len(self.trainingMatrix)
+        totalItems = len(self.trainingMatrix[0])
+        self.U = np.random.rand(totalUsers, k)
+        self.Vt = np.random.rand(k, totalItems)
+
+        # Go through the number of steps for convergence
+        for iteration in range(0, iterations):
+
+            # Iterate through the entire training matrix
+            for row_idx in range(0, totalUsers):
+                for rating_idx in range(0, totalItems):
+                    real_rating = self.trainingMatrix[row_idx][rating_idx]
+
+                    # Only consider the real recorded ratings
+                    if real_rating != 0:
+
+                        # Calculate the error and perform update
+                        predicted_rating = np.dot(self.U[row_idx], self.Vt[:, rating_idx])
+                        eij = real_rating - predicted_rating
+                        self.sgd_update(eij, row_idx, rating_idx, k, learning_rate, regularization)
+
+
+
+    # Method: sgd_update
+    # Purpose: TODO
+    # Arguments: TODO
+    # Return: TODO
+    def sgd_update(self, eij, row_idx, rating_idx, total_k, learning_rate, regul):
+
+        # For the passed in user and item, update their corresponding for each kth latent factor
+        for k in range(0, total_k):
+
+            # Get the old kth latent factor for the user and item
+            user_feature_factor = self.U[row_idx][k]
+            item_feature_factor = self.Vt[k][rating_idx]
+
+            # Perform the update calculation and saved it for the kth latent factor of both of the user and item
+            user_learn_rate_multiply = (2 * eij * item_feature_factor) - (regul * user_feature_factor)
+            item_learn_rate_multiply = (2 * eij * user_feature_factor) - (regul * item_feature_factor)
+            self.U[row_idx][k] = user_feature_factor + (learning_rate * user_learn_rate_multiply)
+            self.Vt[k][rating_idx] = item_feature_factor + (learning_rate * item_learn_rate_multiply)
 
 
     # Method: predict
@@ -179,13 +222,15 @@ class Recommender:
 
         # From matrix_factorization, we can take the decomposed matrix and apply
         # dot product to get the predictions...more on README
-        elif alg == "matrix_factorization":
+        elif alg == Recommender.MF_SVD:
 
             # Perform U * sigma * Vt, Add the mean_users_ratings back to get
             # predictions in between 1 and 5
             U_dot_sigma = np.dot(self.U, self.sigma)
             self.prediction = np.dot(U_dot_sigma, self.Vt) + self.mean_users_ratings
 
+        elif alg == Recommender.MF_SGD:
+            self.prediction = np.dot(self.U, self.Vt)
 
 
     # Method: evaluate

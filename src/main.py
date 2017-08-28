@@ -65,14 +65,20 @@ class Main:
             try:
                 kValue = int(self.args[idxMf + 1])
             except (ValueError, IndexError) as e:
-                print "Invalid Usage of arguments in program for -mf"
-                return
+                print("Default value of k being used: " + str(kValue))
 
-            print("Decomposing training matrix into smaller matrices with hidden features of " + str(kValue))
-            recommendMachine.matrix_factorization(k=kValue)
+            if ("svd" in self.args):
+                print("Decomposing training matrix into smaller matrices with hidden features of " + str(kValue))
+                recommendMachine.matrix_factorization_svd(k=kValue)
 
-            print "Creating Predictions"
-            recommendMachine.predict(alg=recommendMachine.MF)
+                print "Creating Predictions"
+                recommendMachine.predict(alg=recommendMachine.MF_SVD)
+            elif ("sgd" in self.args):
+                print("Decomposing training matrix into smaller matrices with hidden features of " + str(kValue))
+                recommendMachine.stochastic_gradient_descent(k=kValue)
+
+                print "Creating Predictions"
+                recommendMachine.predict(alg=recommendMachine.MF_SGD)
         else:
             print "Creating Similiarity Matrix"
             recommendMachine.createSimMatrix(sim="cosine")
