@@ -1,9 +1,9 @@
 # Beer Deep Learner
 ### Running the Program
-Be in the src directory and run python on the main.py with any options
+Be in the src directory.
 
 Usage:
-```bash
+```
 python ./main.py -tr 100000 -mf sgd
 python ./main.py -tr 100000 -mf 10 sgd
 python ./main.py -tr 100000 -mf 10 svd
@@ -13,20 +13,21 @@ python ./main.py -sp -ndb
 python ./main.py -sp -ndb -mf svd
 
 Options:
--tr {totalRatings}      Specify the number of ratings to use for the data
--sf                     Save the training matrix to a file to use for later
--ndb                    Normalize the data before training. Do not use with sgd algorithm
--sp                     Skip processing the data, use the saved file to get the training matrix
--mf [kvalue] {svd|sgd}  Matrix Factorization using either svd or sgd algorithm
-                        kvalue is optional and specifies the number of k latent factors to use
+-tr {totalRatings}      Specify the number of ratings to use for the data.
+-sf                     Save the training matrix to a file to use for later.
+-ndb                    Normalize the data before training. Do not use with sgd algorithm.
+-sp                     Skip processing the data, use the saved file to get the training matrix.
+-mf [kvalue] {svd|sgd}  Matrix Factorization using either svd or sgd algorithm.
+                        kvalue is optional and specifies the number of k latent factors to use.
 ```
 
 ### Package and Language Dependencies
+```
 Python 2.7
 numpy
 sklearn
 scipy
-
+```
 
 ### Data Files
 
