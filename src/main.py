@@ -1,3 +1,8 @@
+# Title: Main
+# Author: Kenan Mesic
+# Date: 08/29/17
+# Purpose: Class for running the recommender program
+
 import sys
 from process import DataProcesser
 from recommender import Recommender
