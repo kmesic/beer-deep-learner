@@ -13,13 +13,13 @@ python ./main.py -sp -ndb
 python ./main.py -sp -ndb -mf svd
 ```
 
-Options:
--tr {totalRatings}      Specify the number of ratings to use for the data
--sf                     Save the training matrix to a file to use for later
--ndb                    Normalize the data before training. Do not use with sgd algorithm
--sp                     Skip processing the data, use the saved file to get the training matrix
--mf [kvalue] {svd|sgd}  Matrix Factorization using either svd or sgd algorithm
-                        kvalue is optional and specifies the number of k latent factors to use
+Options: <br />
+-tr {totalRatings}      Specify the number of ratings to use for the data <br />
+-sf                     Save the training matrix to a file to use for later <br />
+-ndb                    Normalize the data before training. Do not use with sgd algorithm <br />
+-sp                     Skip processing the data, use the saved file to get the training matrix <br />
+-mf [kvalue] {svd|sgd}  Matrix Factorization using either svd or sgd algorithm <br />
+                        kvalue is optional and specifies the number of k latent factors to use <br />
 
 
 ### Package and Language Dependencies
