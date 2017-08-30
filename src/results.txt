@@ -56,7 +56,15 @@ Model-based Filtering:
 
       k=10:
         iterations 1:
+        ** RMSE: 1.28742600495 **
 
         iterations 10:
+        ** RMSE: 0.924878546248 **
+
+        iterations 25:
+        ** RMSE: 0.82141981606 **
+
+        iterations 50:
+        ** RMSE: 0.758676733548 **
 
     - Training(750,000 reviews), Testing (250,000 reviews)
