@@ -94,7 +94,7 @@ Model-based Filtering:
         iterations 50:
         ** RMSE: **
 
-    - Training(), Testing()
+    - Training(1189961), Testing(396653)
     ** Sparsity: 0.05 **
 
       k=10:
@@ -109,3 +109,11 @@ Model-based Filtering:
 
         iterations 50:
         ** RMSE:  **
+
+  Matrix Factorization (alternating least squares):
+    - Training(1189961), Testing(396653)
+    ** Sparsity: 0.05 **
+
+      k=10:
+        iterations 1:
+        ** RMSE: 3.52719352326 **
