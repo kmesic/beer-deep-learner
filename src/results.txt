@@ -67,4 +67,45 @@ Model-based Filtering:
         iterations 50:
         ** RMSE: 0.758676733548 **
 
+      k=15:
+        iterations: 10:
+        ** RMSE: 0.801438307295 **
+
+      k=20:
+        iterations: 10:
+        ** RMSE: 0.910388421545**
+
+      k=25:
+        iterations 10:
+        **RMSE: 1.09098162042 **
+
     - Training(750,000 reviews), Testing (250,000 reviews)
+    ** Sparsity: 0.07% **
+      k=10:
+        iterations 1:
+        ** RMSE: 1.1717028744**
+
+        iterations 10:
+        ** RMSE: 0.80780135785**
+
+        iterations 25:
+        ** RMSE: **
+
+        iterations 50:
+        ** RMSE: **
+
+    - Training(), Testing()
+    ** Sparsity: 0.05 **
+
+      k=10:
+        iterations 1:
+        ** RMSE: 1.12001406003 **
+
+        iterations 10:
+        ** RMSE:  **
+
+        iterations 25:
+        ** RMSE:  **
+
+        iterations 50:
+        ** RMSE:  **

@@ -21,6 +21,7 @@ class Recommender:
     II_CC = "item-item-collabrative-filtering"
     MF_SVD = "matrix_factorization_svd"
     MF_SGD = "matrix_factorization_sgd"
+    MF_ALS = "matrix_factorization_als"
     FILE_TRAIN_MAT = "../data/train_mat.txt"
     FILE_TEST_MAT = "../data/test_mat.txt"
 
@@ -115,20 +116,11 @@ class Recommender:
     # Arguments: k (optional) - specify how many hidden features to find,
     #                           default to 10
     # Return: None
-    def matrix_factorization_svd(self, k=10, alg="svd"):
+    def matrix_factorization_svd(self, k=10):
 
         # Perform singular-value decomposition and convert sigma into diagonal matrix
-        if alg == "svd":
-            self.U, sigma, self.Vt = svds(self.trainingMatrix, k=k)
-            self.sigma = np.diag(sigma)
-
-        # Perform stochastic gradient descent
-        elif alg == "sgd":
-            return
-
-        # Perform Alternating Least Squares
-        elif alg == "als":
-            return
+        self.U, sigma, self.Vt = svds(self.trainingMatrix, k=k)
+        self.sigma = np.diag(sigma)
 
 
     # Method: stochastic_gradient_descent
@@ -184,6 +176,47 @@ class Recommender:
             self.Vt[k][rating_idx] = item_feature_factor + (learning_rate * item_learn_rate_multiply)
 
 
+    # Method: alternating_least_squares
+    # Purpose: TODO
+    # Arguments: TODO
+    # Return: TODO
+    def alternating_least_squares(self,
+                                  k=10,
+                                  regularization=0.02,
+                                  iterations=1):
+        # Create two matrices to be used for spliting the training matrix
+        # Randomize the matrices intially
+        totalUsers = len(self.trainingMatrix)
+        totalItems = len(self.trainingMatrix[0])
+        self.U = np.random.rand(totalUsers, k)
+        V = np.random.rand(totalItems, k)
+
+        # Create a regularization matrix to be added on.
+        reg = regularization * np.identity(k)
+
+        # Iterate and alternate between keeping the User matrix constant and
+        # then the Item matrix constant
+        for iteration in range(0, iterations):
+            for user_idx in range(0, totalUsers):
+                # Solve for each user, by (VTV + reg) * u = VT * ratings_u
+                #                                       u = (VTV + reg)^-1 * (VT * ratings_u)
+                VTV = np.dot(V.T, V)
+                ratingsU = self.trainingMatrix[user_idx, :]
+                VTV_plus_reg = VTV + reg
+                VTV_dot_ratingsU = np.dot(V.T, ratingsU)
+                self.U[user_idx, :] = np.linalg.solve(VTV_plus_reg, VTV_dot_ratingsU)
+
+            for item_idx in range(0, totalItems):
+                # Solve for each item, by (UTU + reg) * i = UT * ratings_i
+                #                                       i = (UTU + reg)^-1 * (VT * ratings_i)
+                UTU = np.dot(self.U.T, self.U)
+                ratingsI = self.trainingMatrix[:, item_idx]
+                UTU_plus_reg = UTU + reg
+                V[item_idx, :] = np.linalg.solve(UTU_plus_reg, np.dot(self.U.T, ratingsI))
+
+        self.Vt = V.T
+
+
     # Method: predict
     # Purpose: Create a prediction matrix by performing the formulas described
     #          in the README
@@ -229,7 +262,9 @@ class Recommender:
             U_dot_sigma = np.dot(self.U, self.sigma)
             self.prediction = np.dot(U_dot_sigma, self.Vt) + self.mean_users_ratings
 
-        elif alg == Recommender.MF_SGD:
+        # For SGD and ALS, just produce the predications by taking dot product of
+        # the two decomposed matrices
+        elif alg == Recommender.MF_SGD or alg == Recommender.MF_ALS:
             self.prediction = np.dot(self.U, self.Vt)
 
 

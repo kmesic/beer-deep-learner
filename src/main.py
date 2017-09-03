@@ -120,11 +120,27 @@ class Main:
                 # Decompose the training matrix into two matrices with k latent factors using sgd
                 # and pass in the num of iterations to perform sgd on the training matrix
                 print("Decomposing training matrix into smaller matrices with hidden features of " + str(kValue))
-                recommendMachine.stochastic_gradient_descent(k=kValue, iterations=1)
+                print("Using sgd, with total iterations of: " + str(iterations[3]));
+                recommendMachine.stochastic_gradient_descent(k=kValue, iterations=iterations[3])
 
                 # Create a predictions matrix to get all the predicted ratings
                 print "Creating Predictions"
                 recommendMachine.predict(alg=recommendMachine.MF_SGD)
+
+            # Use alternating least squares
+            elif ("als" in self.args):
+                alg = "Matrix Factorization using Alternating least squares"
+                iterations = [1, 2, 5, 10, 25, 50, 100, 200]
+
+                # Decompose the training matrix into two matrices with k latent factors using sgd
+                # and pass in the num of iterations to perform sgd on the training matrix
+                print("Decomposing training matrix into smaller matrices with hidden features of " + str(kValue))
+                print("Using als, with total iterations of: " + str(iterations[0]));
+                recommendMachine.alternating_least_squares(k=kValue, iterations=iterations[0])
+
+                # Create a predictions matrix to get all the predicted ratings
+                print "Creating Predictions"
+                recommendMachine.predict(alg=recommendMachine.MF_ALS)
 
             # Otherwise error because no algorithm was specified to use
             else:
