@@ -69,6 +69,15 @@ class Main:
             print(len(dataProcessor.training))
             print(len(dataProcessor.testing))
 
+            """ DEBUGGING
+            count = 0
+            for review in dataProcessor.training:
+                if count > 100:
+                    return
+                count+=1
+                print review
+            """
+
             # Calculate the sparsity of the training matrix
             numerator = float(len(dataProcessor.training))
             denominator = float(dataProcessor.totalUsersReviewed * dataProcessor.totalBeersReviewed)
@@ -120,8 +129,8 @@ class Main:
                 # Decompose the training matrix into two matrices with k latent factors using sgd
                 # and pass in the num of iterations to perform sgd on the training matrix
                 print("Decomposing training matrix into smaller matrices with hidden features of " + str(kValue))
-                print("Using sgd, with total iterations of: " + str(iterations[3]));
-                recommendMachine.stochastic_gradient_descent(k=kValue, iterations=iterations[3])
+                print("Using sgd, with total iterations of: " + str(iterations[0]));
+                recommendMachine.stochastic_gradient_descent(k=kValue, iterations=iterations[0])
 
                 # Create a predictions matrix to get all the predicted ratings
                 print "Creating Predictions"
@@ -156,6 +165,9 @@ class Main:
 
             print "Creating Predictions"
             recommendMachine.predict()
+
+        # Print some recommendations to see revelance of the machine
+        recommendMachine.printRecommendations(user=0)
 
         # Evaluate the reccommender machine using RMSE
         print "\nEvaluating the Recommender Machine using the testing data"

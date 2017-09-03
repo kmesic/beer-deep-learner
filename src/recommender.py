@@ -42,6 +42,8 @@ class Recommender:
                        saveToFile=False,
                        readFromFiles=True,
                        normalizeDataBefore=False):
+        self.mappingIdxToBeer = {}
+
         if alg == None:
             alg = self.CC
 
@@ -105,6 +107,9 @@ class Recommender:
 
             # Convert the overall rating to float and save to the matrix
             matrix[userIdx, itemIdx] = float(review["overall"])
+
+            # Store the mapping to be able to print out the beer recommendations later
+            self.mappingIdxToBeer[itemIdx] = review["name"]
 
         return matrix
 
@@ -302,6 +307,38 @@ class Recommender:
             self.simMatrix = metrics.pairwise.pairwise_distances(self.trainingMatrix,metric=sim)
         elif alg == "item":
             self.simMatrix = metrics.pairwise.pairwise_distances(self.trainingMatrix.T,metric=sim)
+
+
+    # Method: printRecommendations
+    # Purpose: TODO
+    # Arguments: TODO
+    # Return: TODO
+    def printRecommendations(self, user=0):
+        user_predications = self.prediction[user, :].tolist()
+        user_ratings = self.trainingMatrix[user, :]
+        ratingsNames = []
+        ratingsIdx = []
+        recommendationNames = []
+        for idx, rating in enumerate(user_ratings):
+            if rating > 0:
+                beerName = self.mappingIdxToBeer[idx]
+                ratingsNames.append((beerName, rating))
+                ratingsIdx.append(idx)
+
+        user_predications.sort(reverse=True)
+        for idx, predication in enumerate(user_predications):
+            if idx not in ratingsIdx:
+                beerName = self.mappingIdxToBeer[idx]
+                recommendationNames.append((beerName, predication))
+
+
+        print "User " + str(user) + " rated: "
+        print ratingsNames
+
+        print "Recommendations: "
+        print recommendationNames[:20]
+
+
 
 
     """ THIS METHOD IS FOR LEARNING PURPOSES NOT PRODUCTION"""
