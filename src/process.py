@@ -9,7 +9,7 @@ import random
 
 """
 Beer Review Structure in File:
----Ratings out of 5 in foat---
+---Ratings out of 5 in float---
 beer/name:
 beer/beerId:
 beer/brewerId:
@@ -120,7 +120,11 @@ class DataProcesser:
         users = {}
         uniqueIdxUser = 0
         uniqueIdxItem = 0
+        filterIdxUser = 0
+        filterIdxItem = 0
         self.totalReviews = 0
+        beersWithMoreRatings = {}
+        usersWithMoreRatings = {}
 
         # Open the gzip file
         with gzip.open(filename) as f:
@@ -152,11 +156,18 @@ class DataProcesser:
                     # Used to count number of unique beers
                     elif key[1] == 'beerId':
                         if value in beers:
-                            review["itemIdx"] = beers[value]
+                            #review["itemIdx"] = beers[value][0]
+                            #beers[value] = (beers[value][0], beers[value][1] + 1)
+                            beers[value] += 1
+                            if (beers[value] == 5):
+                                beersWithMoreRatings[value] = filterIdxItem
+                                filterIdxItem += 1
                         else:
-                            beers[value] = uniqueIdxItem
-                            review["itemIdx"] = uniqueIdxItem
-                            uniqueIdxItem += 1
+                            beers[value] = 1
+                            #beers[value] = (uniqueIdxItem, 1)
+                            #review["itemIdx"] = uniqueIdxItem
+                            #uniqueIdxItem += 1
+
 
                     review[key[1]] = value
 
@@ -164,24 +175,48 @@ class DataProcesser:
                 elif key[0] == 'review':
                     review[key[1]] = value
 
+                    # Used to count number of unique users
+                    if key[1] == 'profileName':
+                        if value in users:
+                            #review["userIdx"] = users[value][0]
+                            #users[value] = (users[value][0], users[value][1] + 1)
+                            users[value] += 1
+                            if (users[value] == 10):
+                                usersWithMoreRatings[value] = filterIdxUser
+                                filterIdxUser += 1
+                        else:
+                            users[value] = 1
+                            #users[value] = (uniqueIdxUser, 1)
+                            #review["userIdx"] = uniqueIdxUser
+                            #uniqueIdxUser += 1
+
                     # If at the end of the review, save the review to reviews
-                    if key[1] == 'text':
+                    elif key[1] == 'text':
                         self.reviews.append(review)
                         self.totalReviews += 1
 
-                    # Used to count number of unique users
-                    elif key[1] == 'profileName':
-                        if value in users:
-                            review["userIdx"] = users[value]
-                        else:
-                            users[value] = uniqueIdxUser
-                            review["userIdx"] = uniqueIdxUser
-                            uniqueIdxUser += 1
-
 
         # Count the total amount of unique beers and users from the reviews
-        self.totalBeersReviewed = len(beers)
-        self.totalUsersReviewed = len(users)
+        #self.totalBeersReviewed = len(beers)
+        #self.totalUsersReviewed = len(users)
+        self.totalBeersReviewed = len(beersWithMoreRatings)
+        self.totalUsersReviewed = len(usersWithMoreRatings)
+
+        print self.totalBeersReviewed
+        print self.totalUsersReviewed
+        print len(beersWithMoreRatings)
+        print len(usersWithMoreRatings)
+
+        oldReviews = self.reviews
+        self.reviews = []
+        for review in oldReviews:
+            if review['profileName'] in usersWithMoreRatings and review['beerId'] in beersWithMoreRatings:
+                review["userIdx"] = usersWithMoreRatings[review['profileName']]
+                review["itemIdx"] = beersWithMoreRatings[review['beerId']]
+                self.reviews.append(review)
+
+        with open('../data/beer_count.json', 'w') as fp:
+            json.dump(beers, fp, sort_keys=True, indent=4)
 
 
     # Method: parseUsers

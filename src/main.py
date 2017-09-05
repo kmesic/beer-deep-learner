@@ -95,7 +95,16 @@ class Main:
                                            normalizeDataBefore=normalizeDataBefore,
                                            readFromFiles=False)
 
+
         alg = ""
+
+        if ("-lpred" in self.args):
+            print "Saving the idx to beer file"
+            recommendMachine.saveMappingFromIdxToBeer()
+
+            print "Saving Recommendations"
+            recommendMachine.saveRecommendations()
+            return
 
         # Model based filtering using matrix factorization
         # Specify with -mf {kvalue}, ex. -mf 25
@@ -129,8 +138,8 @@ class Main:
                 # Decompose the training matrix into two matrices with k latent factors using sgd
                 # and pass in the num of iterations to perform sgd on the training matrix
                 print("Decomposing training matrix into smaller matrices with hidden features of " + str(kValue))
-                print("Using sgd, with total iterations of: " + str(iterations[0]));
-                recommendMachine.stochastic_gradient_descent(k=kValue, iterations=iterations[0])
+                print("Using sgd, with total iterations of: " + str(iterations[3]));
+                recommendMachine.stochastic_gradient_descent(k=kValue, iterations=iterations[3])
 
                 # Create a predictions matrix to get all the predicted ratings
                 print "Creating Predictions"
@@ -168,6 +177,9 @@ class Main:
 
         # Print some recommendations to see revelance of the machine
         recommendMachine.printRecommendations(user=0)
+
+        if ("-spred" in self.args):
+            recommendMachine.savePredictions()
 
         # Evaluate the reccommender machine using RMSE
         print "\nEvaluating the Recommender Machine using the testing data"

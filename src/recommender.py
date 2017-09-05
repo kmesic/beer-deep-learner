@@ -8,6 +8,7 @@ from sklearn import metrics
 from scipy.sparse.linalg import svds
 from math import sqrt
 import os.path
+import json
 
 
 # Class: DataProcesser
@@ -24,6 +25,11 @@ class Recommender:
     MF_ALS = "matrix_factorization_als"
     FILE_TRAIN_MAT = "../data/train_mat.txt"
     FILE_TEST_MAT = "../data/test_mat.txt"
+    FILE_PRED_MAT = "../data/predications.txt"
+    FILE_RECOM = "../data/recommendations.txt"
+    FILE_RATINGS = "../data/top_ratings.txt"
+    MAPPING_IDX_BEER = "../data/mapping_idx_beer"
+    TOP_RECOMMENDATIONS = 20
 
 
     # Method: Constructor
@@ -34,6 +40,8 @@ class Recommender:
     #            alg (optional) - type of machine learning algorithm to use
     #            readFromFiles (optional) - read the training matrix and testing matrix
     #                                       from files
+    #            empty (optional) - whether to build the machine with the training matrix
+    #                               or leave it empty
     def __init__(self, trainingData=None,
                        testingData=None,
                        totalUsers=None,
@@ -41,8 +49,12 @@ class Recommender:
                        alg=None,
                        saveToFile=False,
                        readFromFiles=True,
-                       normalizeDataBefore=False):
+                       normalizeDataBefore=False,
+                       empty=False):
         self.mappingIdxToBeer = {}
+
+        if empty == True:
+            return
 
         if alg == None:
             alg = self.CC
@@ -112,6 +124,15 @@ class Recommender:
             self.mappingIdxToBeer[itemIdx] = review["name"]
 
         return matrix
+
+    def cleanData(self, userMinReviews=10, itemMinReviews=5):
+        userIdx = 0
+        for user in self.trainingMatrix:
+            totalReviews = np.count_nonzero(user)
+            if totalReviews < userMinReviews:
+                np.delete(self.trainingMatrix, userIdx, 0)
+            userIdx += 1
+        print len(self.trainingMatrix)
 
 
     # Method: matrix_factorization_svd
@@ -339,27 +360,70 @@ class Recommender:
         print recommendationNames[:20]
 
 
+    # Method: savePredictions
+    # Purpose: TODO
+    # Arguments: TODO
+    # Return: TODO
+    def savePredictions(self):
+        np.savetxt(self.FILE_PRED_MAT, self.prediction, fmt='%1.1f')
 
 
-    """ THIS METHOD IS FOR LEARNING PURPOSES NOT PRODUCTION"""
-    # Method: createSimilarityMatrixLearn
-    # Purpose: Create a Similarity Matrix from the training data and use cosine
-    #          similarity as a way to find similarity between two users or items
-    # Arguments: alg (optional) - algorithm to use (user-item or item-item),
-    #                             defaults to user-item
-    # Return: None
-    def createSimilarityMatrix(self, alg=None, speed="fast"):
-        # small number to deal with divides by 0
-        errorDecimal = 1e-9
-        if alg == None:
-            alg = self.UI_CC
+    # Method: saveRecommendations
+    # Purpose: TODO
+    # Arguments: TODO
+    # Return: TODO
+    def saveRecommendations(self):
+        with open(self.FILE_RECOM, 'w') as rec, open(self.FILE_RATINGS, 'w') as rat, open(self.FILE_PRED_MAT, 'r') as pred:
+            user = 0
+            for line in pred:
+                user_predications = map(float, line.split())
+                user_ratings = self.trainingMatrix[user, :].tolist()
+                ratingsNames = []
+                ratingsIdx = []
+                recommendationNames = []
+                user_ratings.sort(reverse=True)
+                for idx, rating in enumerate(user_ratings):
+                    if rating > 0:
+                        beerName = self.mappingIdxToBeer[idx]
+                        ratingsNames.append((beerName, rating))
+                        ratingsIdx.append(idx)
 
-        if speed == "fast":
-            # Perform cosine similarity dependent on algorithm
-            if alg == self.UI_CC:
-                simMatrix = self.trainingMatrix.dot(self.trainingMatrix.T) + errorDecimal
-            elif alg == self.II_CC:
-                simMatrix = self.trainingMatrix.T.dot(self.trainingMatrix) + errorDecimal
-            normalization = np.array([np.sqrt(np.diagonal(simMatrix))])
+                user_predications.sort(reverse=True)
+                totalRecommendations = 0
+                for idx, predication in enumerate(user_predications):
+                    if idx not in ratingsIdx:
+                        beerName = self.mappingIdxToBeer[idx]
+                        recommendationNames.append((beerName, predication))
+                        totalRecommendations += 1
 
-            self.similarityMatrix = simMatrix/(normalization * normalization.T)
+                    if totalRecommendations >= self.TOP_RECOMMENDATIONS:
+                        break
+
+                recommendStringList = [str(r[0]) + "::" + ("%.1f" % r[1]) for r in recommendationNames]
+                lineToWrite = ", ".join(recommendStringList)
+                rec.write(lineToWrite + "\n")
+
+                # Take top 20 ratings
+                ratingsNames = ratingsNames[:20]
+                ratingsStringList =  [str(r[0]) + "::" + ("%.1f" % r[1]) for r in ratingsNames]
+                lineToWrite = ", ".join(ratingsStringList)
+                rat.write(lineToWrite + "\n")
+
+                user += 1
+
+
+    # Method: loadPredications
+    # Purpose: TODO
+    # Arguments: TODO
+    # Return: TODO
+    def loadPredications(self):
+        self.predications = np.loadtxt(self.FILE_PRED_MAT)
+
+
+    # Method: saveMappingFromIdxToBeer
+    # Purpose: TODO
+    # Arguments: TODO
+    # Return: TODO
+    def saveMappingFromIdxToBeer(self):
+        with open('../data/mapping.json', 'w') as fp:
+            json.dump(self.mappingIdxToBeer, fp, sort_keys=True, indent=4)
