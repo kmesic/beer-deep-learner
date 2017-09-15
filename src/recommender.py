@@ -373,6 +373,7 @@ class Recommender:
     # Arguments: TODO
     # Return: TODO
     def saveRecommendations(self):
+        print "Saving Recommendatons to file"
         with open(self.FILE_RECOM, 'w') as rec, open(self.FILE_RATINGS, 'w') as rat, open(self.FILE_PRED_MAT, 'r') as pred:
             user = 0
             for line in pred:
@@ -381,14 +382,14 @@ class Recommender:
                 ratingsNames = []
                 ratingsIdx = []
                 recommendationNames = []
-                user_ratings.sort(reverse=True)
                 for idx, rating in enumerate(user_ratings):
                     if rating > 0:
                         beerName = self.mappingIdxToBeer[idx]
                         ratingsNames.append((beerName, rating))
                         ratingsIdx.append(idx)
 
-                user_predications.sort(reverse=True)
+                ratingsNames.sort(key=lambda rating: rating[1], reverse=True)
+
                 totalRecommendations = 0
                 for idx, predication in enumerate(user_predications):
                     if idx not in ratingsIdx:
@@ -396,9 +397,10 @@ class Recommender:
                         recommendationNames.append((beerName, predication))
                         totalRecommendations += 1
 
-                    if totalRecommendations >= self.TOP_RECOMMENDATIONS:
-                        break
+                recommendationNames.sort(key=lambda pred: pred[1], reverse=True)
 
+                # Take top 20 recommendations
+                recommendationNames = recommendationNames[:20]
                 recommendStringList = [str(r[0]) + "::" + ("%.1f" % r[1]) for r in recommendationNames]
                 lineToWrite = ", ".join(recommendStringList)
                 rec.write(lineToWrite + "\n")

@@ -1,0 +1,13 @@
+Set up App Engine on GCloud:
+
+Follow steps in link: https://cloud.google.com/appengine/docs/standard/python/googlecloudstorageclient/app-engine-cloud-storage-sample
+
+However for the virtualenv section, instead of running the following commands:
+  virtualenv env
+  env\scripts\activate
+  pip install -t lib -r requirements.txt
+
+Run these instead:
+  python -m virtualenv env
+  Scripts\activate
+  pip install -t lib -r requirements.txt

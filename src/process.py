@@ -159,7 +159,7 @@ class DataProcesser:
                             #review["itemIdx"] = beers[value][0]
                             #beers[value] = (beers[value][0], beers[value][1] + 1)
                             beers[value] += 1
-                            if (beers[value] == 5):
+                            if (beers[value] == 20):
                                 beersWithMoreRatings[value] = filterIdxItem
                                 filterIdxItem += 1
                         else:

@@ -179,7 +179,11 @@ class Main:
         recommendMachine.printRecommendations(user=0)
 
         if ("-spred" in self.args):
+            print "Saving Predications"
             recommendMachine.savePredictions()
+
+            print "Saving Recommendations"
+            recommendMachine.saveRecommendations()
 
         # Evaluate the reccommender machine using RMSE
         print "\nEvaluating the Recommender Machine using the testing data"
